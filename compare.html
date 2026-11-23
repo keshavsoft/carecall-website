@@ -42,9 +42,15 @@
     }
     .nav-brand { font-size: 1.1rem; font-weight: 800; color: var(--sky); display: flex; align-items: center; gap: 7px; }
     .nav-brand span { color: var(--green); }
-    .nav-links { display: flex; gap: 24px; }
+    .nav-links { display: flex; gap: 20px; align-items: center; }
     .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.88rem; font-weight: 600; transition: color .15s; }
     .nav-links a:hover { color: var(--text); }
+    .nav-btn {
+      padding: 6px 14px; border-radius: 999px; font-size: 0.82rem; font-weight: 700;
+      background: rgba(56,189,248,0.12); border: 1px solid rgba(56,189,248,0.3); color: #7dd3fc !important;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .nav-btn:hover { background: rgba(56,189,248,0.22); color: #fff !important; }
 
     /* ─── HERO ─── */
     .hero {
@@ -192,6 +198,10 @@
     <a href="#flow">Message Flow</a>
     <a href="#code">Code Diff</a>
     <a href="#key">Key Concept</a>
+    <a href="https://github.com/keshavsoft" target="_blank" rel="noopener noreferrer" class="nav-btn">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      GitHub
+    </a>
   </div>
 </nav>
 
@@ -232,6 +242,11 @@
           &nbsp;
           <span class="badge badge-sky">1 ws channel</span>
         </div>
+        <div style="margin-top:16px;">
+          <a href="https://github.com/keshavsoft/appointment-notifier" target="_blank" rel="noopener noreferrer" style="color:#7dd3fc; text-decoration:none; font-size:0.84rem; font-weight:700;">
+            📂 github.com/keshavsoft/appointment-notifier →
+          </a>
+        </div>
       </div>
 
       <div class="card-v4">
@@ -251,6 +266,11 @@
           <span class="badge badge-green">Map of state</span>
           &nbsp;
           <span class="badge badge-green">Map of channels</span>
+        </div>
+        <div style="margin-top:16px;">
+          <a href="https://github.com/keshavsoft/appointment-notifier-screens" target="_blank" rel="noopener noreferrer" style="color:#6ee7b7; text-decoration:none; font-size:0.84rem; font-weight:700;">
+            📂 github.com/keshavsoft/appointment-notifier-screens →
+          </a>
         </div>
       </div>
     </div>
@@ -506,6 +526,17 @@
 <footer>
   <strong>CareCall</strong> · Open Source · Self-Hosted · Telugu + English Voice
   <br><br>
+  <div style="display:flex; justify-content:center; gap:24px; flex-wrap:wrap; margin-bottom:12px;">
+    <a href="https://github.com/keshavsoft/appointment-notifier" target="_blank" rel="noopener noreferrer" style="color:var(--sky); text-decoration:none; font-weight:600;">
+      🐙 appointment-notifier
+    </a>
+    <a href="https://github.com/keshavsoft/appointment-notifier-screens" target="_blank" rel="noopener noreferrer" style="color:var(--green); text-decoration:none; font-weight:600;">
+      🐙 appointment-notifier-screens
+    </a>
+    <a href="https://github.com/keshavsoft/carecall-website" target="_blank" rel="noopener noreferrer" style="color:var(--purple); text-decoration:none; font-weight:600;">
+      🐙 carecall-website
+    </a>
+  </div>
   <a href="index.html">← Back to Home</a>
   &nbsp;·&nbsp;
   <span style="color:var(--dim);">appointment-notifier (v1) &amp; appointment-notifier-screens (v4)</span>
