@@ -1,0 +1,731 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#07131d">
+  <title>CareCall — Smart Clinic Queue System</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --sky:    #38bdf8;
+      --green:  #34d399;
+      --purple: #a855f7;
+      --amber:  #f59e0b;
+      --bg:     #07131d;
+      --bg2:    #0b1926;
+      --bg3:    #060f18;
+      --card:   rgba(15,23,42,0.88);
+      --border: rgba(148,163,184,0.18);
+      --text:   #f1f5f9;
+      --muted:  #94a3b8;
+      --dim:    #64748b;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─── NAV ─────────────────────────────────────────────── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 32px;
+      background: rgba(7,19,29,0.92);
+      border-bottom: 1px solid rgba(56,189,248,0.15);
+      backdrop-filter: blur(12px);
+    }
+    .nav-brand { font-size: 1.1rem; font-weight: 800; color: var(--sky); display: flex; align-items: center; gap: 7px; }
+    .nav-brand span { color: var(--green); }
+    .nav-links { display: flex; gap: 24px; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.88rem; font-weight: 600; transition: color .15s; }
+    .nav-links a:hover { color: var(--text); }
+
+    /* ─── HERO ────────────────────────────────────────────── */
+    .hero {
+      position: relative; overflow: hidden;
+      padding: 100px 24px 80px;
+      text-align: center;
+      background:
+        radial-gradient(ellipse at 50% -20%, rgba(56,189,248,0.22) 0%, transparent 55%),
+        linear-gradient(170deg, #07131d 0%, #0b1926 60%, #050d15 100%);
+    }
+    .hero::after {
+      content: "";
+      position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2338bdf8' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      pointer-events: none;
+    }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 0.8rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--sky); margin-bottom: 20px;
+      background: rgba(56,189,248,0.08); border: 1px solid rgba(56,189,248,0.25);
+      padding: 6px 16px; border-radius: 999px;
+    }
+    .hero h1 {
+      font-size: clamp(2.4rem, 6vw, 4rem); font-weight: 900; letter-spacing: -0.02em;
+      line-height: 1.1; margin-bottom: 20px;
+    }
+    .hero h1 em { font-style: normal; color: var(--sky); }
+    .hero .sub {
+      font-size: 1.15rem; color: var(--muted); max-width: 580px; margin: 0 auto 36px;
+    }
+    .hero-badges { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 56px; }
+    .badge {
+      font-size: 0.78rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;
+      padding: 5px 14px; border-radius: 999px;
+    }
+    .badge-sky    { background: rgba(56,189,248,0.12);  color: #7dd3fc; border: 1px solid rgba(56,189,248,0.3); }
+    .badge-green  { background: rgba(52,211,153,0.12);  color: #6ee7b7; border: 1px solid rgba(52,211,153,0.3); }
+    .badge-purple { background: rgba(168,85,247,0.12);  color: #c084fc; border: 1px solid rgba(168,85,247,0.3); }
+    .badge-amber  { background: rgba(245,158,11,0.12);  color: #fcd34d; border: 1px solid rgba(245,158,11,0.3); }
+
+    .hero-ctas { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 13px 28px; border-radius: 14px;
+      background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+      color: #07131d; font-weight: 800; font-size: 0.95rem;
+      text-decoration: none; transition: transform .15s, box-shadow .15s;
+      box-shadow: 0 8px 24px rgba(56,189,248,0.3);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(56,189,248,0.4); }
+    .btn-ghost {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 13px 28px; border-radius: 14px;
+      border: 1px solid var(--border); color: var(--muted);
+      font-weight: 700; font-size: 0.95rem; text-decoration: none;
+      transition: color .15s, border-color .15s;
+    }
+    .btn-ghost:hover { color: var(--text); border-color: rgba(148,163,184,0.4); }
+
+    /* ─── SECTION WRAPPER ─────────────────────────────────── */
+    section { padding: 80px 24px; }
+    .container { max-width: 1060px; margin: 0 auto; }
+    .section-label {
+      font-size: 0.8rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--sky); margin-bottom: 10px;
+    }
+    .section-title { font-size: clamp(1.8rem,4vw,2.6rem); font-weight: 900; letter-spacing: -0.01em; margin-bottom: 14px; }
+    .section-desc { color: var(--muted); font-size: 1.05rem; max-width: 640px; }
+
+    /* ─── PROBLEM ─────────────────────────────────────────── */
+    .problem { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .problem-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 24px; margin-top: 48px; }
+    @media(max-width:720px){ .problem-grid { grid-template-columns:1fr; } }
+    .problem-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 20px;
+      padding: 28px 24px;
+    }
+    .problem-icon { font-size: 2rem; margin-bottom: 14px; }
+    .problem-card h3 { font-size: 1rem; font-weight: 800; margin-bottom: 8px; }
+    .problem-card p  { color: var(--muted); font-size: 0.9rem; line-height: 1.55; }
+
+    /* ─── HOW IT WORKS ────────────────────────────────────── */
+    .steps { display: grid; grid-template-columns: repeat(2,1fr); gap: 20px; margin-top: 48px; }
+    @media(max-width:720px){ .steps { grid-template-columns:1fr; } }
+    .step {
+      display: flex; gap: 18px;
+      background: var(--card); border: 1px solid var(--border); border-radius: 18px;
+      padding: 24px 20px;
+    }
+    .step-num {
+      flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(56,189,248,0.15); border: 1px solid rgba(56,189,248,0.3);
+      color: var(--sky); font-weight: 900; font-size: 0.95rem;
+      display: grid; place-items: center;
+    }
+    .step-body h4 { font-size: 0.95rem; font-weight: 800; margin-bottom: 4px; }
+    .step-body p  { color: var(--muted); font-size: 0.88rem; line-height: 1.5; }
+
+    /* ─── THE TWO EDITIONS ────────────────────────────────── */
+    .editions { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .editions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 52px; }
+    @media(max-width:720px){ .editions-grid { grid-template-columns:1fr; } }
+
+    .edition-card {
+      border-radius: 24px; padding: 36px 30px;
+      border: 2px solid;
+      position: relative; overflow: hidden;
+    }
+    .edition-v1 {
+      background: rgba(56,189,248,0.04);
+      border-color: rgba(56,189,248,0.3);
+    }
+    .edition-v4 {
+      background: rgba(52,211,153,0.04);
+      border-color: rgba(52,211,153,0.3);
+    }
+    .edition-tag {
+      display: inline-flex; align-items: center; gap: 7px;
+      font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 4px 12px; border-radius: 999px; margin-bottom: 20px;
+    }
+    .tag-v1 { background: rgba(56,189,248,0.12); color: #7dd3fc; border: 1px solid rgba(56,189,248,0.25); }
+    .tag-v4 { background: rgba(52,211,153,0.12); color: #6ee7b7; border: 1px solid rgba(52,211,153,0.25); }
+
+    .edition-name { font-size: 1.5rem; font-weight: 900; margin-bottom: 10px; }
+    .edition-tagline { color: var(--muted); font-size: 0.95rem; margin-bottom: 24px; line-height: 1.5; }
+    .edition-features { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+    .edition-features li { display: flex; align-items: flex-start; gap: 10px; font-size: 0.9rem; }
+    .feat-check { flex-shrink: 0; margin-top: 2px; }
+    .edition-port {
+      font-size: 0.8rem; font-weight: 700; padding: 6px 14px; border-radius: 999px;
+      background: rgba(15,23,42,0.6); border: 1px solid var(--border);
+      color: var(--muted); display: inline-flex; align-items: center; gap: 6px;
+    }
+
+    /* ─── ARCHITECTURE ────────────────────────────────────── */
+    .arch-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-top: 52px; }
+    @media(max-width:800px){ .arch-grid { grid-template-columns:1fr; } }
+    .arch-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 20px; overflow: hidden;
+    }
+    .arch-header {
+      padding: 16px 22px;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.85rem; font-weight: 800; display: flex; align-items: center; gap: 10px;
+    }
+    .arch-header .dot { width: 8px; height: 8px; border-radius: 50%; }
+    .arch-body { padding: 22px; }
+    .arch-diagram {
+      font-family: "Courier New", Courier, monospace;
+      font-size: 0.78rem; line-height: 1.7;
+      color: #94a3b8;
+      white-space: pre;
+      overflow-x: auto;
+    }
+    .arch-diagram .hl-sky    { color: #38bdf8; }
+    .arch-diagram .hl-green  { color: #34d399; }
+    .arch-diagram .hl-purple { color: #c084fc; }
+    .arch-diagram .hl-amber  { color: #fcd34d; }
+
+    /* ─── SCREENS ─────────────────────────────────────────── */
+    .screens-alt { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .screens-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; margin-top: 48px; }
+    @media(max-width:800px){ .screens-grid { grid-template-columns:1fr; } }
+    .screen-card {
+      background: var(--card); border: 2px solid var(--border); border-radius: 20px; padding: 26px 22px;
+      transition: transform .15s, border-color .15s;
+    }
+    .screen-card:hover { transform: translateY(-3px); }
+    .sc-display:hover { border-color: var(--sky); }
+    .sc-mobile:hover  { border-color: var(--green); }
+    .sc-dr:hover      { border-color: var(--purple); }
+    .screen-icon {
+      width: 48px; height: 48px; border-radius: 14px;
+      display: grid; place-items: center; font-size: 1.5rem; margin-bottom: 16px;
+    }
+    .si-display { background: rgba(56,189,248,0.15); }
+    .si-mobile  { background: rgba(52,211,153,0.15); }
+    .si-dr      { background: rgba(168,85,247,0.15); }
+    .screen-card h3 { font-size: 1rem; font-weight: 800; margin-bottom: 6px; }
+    .screen-card p  { color: var(--muted); font-size: 0.88rem; line-height: 1.5; margin-bottom: 14px; }
+    .screen-url {
+      font-size: 0.75rem; font-weight: 700; font-family: monospace;
+      padding: 4px 10px; border-radius: 8px;
+      background: rgba(15,23,42,0.7); border: 1px solid var(--border); color: var(--dim);
+    }
+
+    /* ─── AUDIO ───────────────────────────────────────────── */
+    .audio-row {
+      display: grid; grid-template-columns: repeat(2,1fr); gap: 20px; margin-top: 48px;
+    }
+    @media(max-width:720px){ .audio-row { grid-template-columns:1fr; } }
+    .audio-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 24px 22px;
+    }
+    .audio-card h3 { font-size: 0.95rem; font-weight: 800; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .audio-card p  { color: var(--muted); font-size: 0.88rem; line-height: 1.55; }
+
+    /* ─── QUICK-START ─────────────────────────────────────── */
+    .qs-alt { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .qs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 48px; }
+    @media(max-width:720px){ .qs-grid { grid-template-columns:1fr; } }
+    .qs-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 20px; overflow: hidden;
+    }
+    .qs-header {
+      padding: 14px 20px; border-bottom: 1px solid var(--border);
+      font-size: 0.82rem; font-weight: 800; display: flex; align-items: center; gap: 10px;
+    }
+    .qs-body { padding: 20px; }
+    pre.code {
+      background: rgba(0,0,0,0.3); border: 1px solid rgba(148,163,184,0.1);
+      border-radius: 12px; padding: 16px; overflow-x: auto;
+      font-size: 0.82rem; line-height: 1.65; color: #94a3b8;
+      font-family: "Courier New", Courier, monospace;
+    }
+    pre.code .c-comment { color: #475569; }
+    pre.code .c-cmd     { color: #38bdf8; }
+    pre.code .c-url     { color: #34d399; }
+    pre.code .c-key     { color: #fcd34d; }
+
+    /* ─── COMPARISON TABLE ────────────────────────────────── */
+    .compare-table-wrap { overflow-x: auto; margin-top: 48px; }
+    table.cmp {
+      width: 100%; border-collapse: collapse; font-size: 0.88rem;
+    }
+    table.cmp thead th {
+      padding: 14px 20px; text-align: left;
+      background: rgba(15,23,42,0.9); border-bottom: 1px solid var(--border);
+      font-weight: 800; color: var(--muted); font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase;
+    }
+    table.cmp tbody tr { border-bottom: 1px solid rgba(148,163,184,0.08); }
+    table.cmp tbody tr:last-child { border-bottom: none; }
+    table.cmp tbody td { padding: 14px 20px; vertical-align: top; }
+    table.cmp tbody td:first-child { color: var(--muted); font-weight: 700; }
+    .cmp-yes  { color: #34d399; font-weight: 700; }
+    .cmp-no   { color: #ef4444; }
+    .cmp-sky  { color: #38bdf8; font-weight: 700; }
+    .cmp-grn  { color: #34d399; font-weight: 700; }
+
+    /* ─── FOOTER ──────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 24px; text-align: center; color: var(--dim); font-size: 0.82rem;
+    }
+    footer strong { color: var(--muted); }
+
+    /* ─── DIVIDER ─────────────────────────────────────────── */
+    .divider { width: 48px; height: 3px; border-radius: 999px; background: linear-gradient(90deg, var(--sky), var(--green)); margin: 16px 0 32px; }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">✚ CareCall <span>Docs</span></div>
+  <div class="nav-links">
+    <a href="#problem">Problem</a>
+    <a href="#how">How It Works</a>
+    <a href="#editions">Two Editions</a>
+    <a href="#screens">Screens</a>
+    <a href="#start">Quick Start</a>
+    <a href="compare.html">Compare →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-eyebrow">🏥 Open Source · Self-Hosted · Telugu Voice</div>
+    <h1>Smart Clinic <em>Queue Calling</em><br>with Real-Time Voice</h1>
+    <p class="sub">
+      CareCall is a lightweight, plug-and-play appointment token system for clinics and hospitals.
+      Doctors call numbers from any device. Waiting room TVs announce them instantly — in Telugu and English.
+    </p>
+    <div class="hero-badges">
+      <span class="badge badge-sky">📡 WebSocket Real-Time</span>
+      <span class="badge badge-green">🔊 Telugu Voice</span>
+      <span class="badge badge-purple">📱 Mobile + TV</span>
+      <span class="badge badge-amber">⚡ Zero Database</span>
+    </div>
+    <div class="hero-ctas">
+      <a href="#editions" class="btn-primary">Explore the Two Editions →</a>
+      <a href="#start" class="btn-ghost">Quick Start ↓</a>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section class="problem" id="problem">
+  <div class="container">
+    <div class="section-label">The Problem</div>
+    <h2 class="section-title">Clinic Queues Are Broken</h2>
+    <div class="divider"></div>
+    <p class="section-desc">
+      In most clinics, patients wait in silence — nobody knows whose turn it is.
+      Staff shout names, nurses walk the hallway, monitors show nothing.
+      CareCall fixes this with zero complexity.
+    </p>
+    <div class="problem-grid">
+      <div class="problem-card">
+        <div class="problem-icon">😤</div>
+        <h3>Patients Miss Their Turn</h3>
+        <p>No display means patients wander, miss their call, and block the queue — causing frustration for everyone.</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">📢</div>
+        <h3>Staff Have to Shout</h3>
+        <p>Nurses calling numbers by voice is unreliable, undignified, and doesn't scale to large waiting areas.</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">🏗️</div>
+        <h3>Existing Systems Are Too Heavy</h3>
+        <p>Commercial queue systems require dedicated hardware, complex software, and expensive licenses. CareCall needs nothing but a laptop and a TV.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="container">
+    <div class="section-label">The Solution</div>
+    <h2 class="section-title">How CareCall Works</h2>
+    <div class="divider"></div>
+    <p class="section-desc">
+      A doctor taps a token number. Every paired display screen shows and announces it instantly.
+      No database. No login. No wires beyond the LAN.
+    </p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>🚀 Start the Server</h4>
+          <p>Run <code>npm start</code> on any laptop. The server starts on your LAN in seconds. No cloud, no setup wizard.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>📺 Open the Display on the TV</h4>
+          <p>Open the TV browser, type the server's LAN IP. The Waiting Display loads — full-screen, bilingual, ready.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>🩺 Doctor Opens Their Keypad</h4>
+          <p>Doctor opens <code>/dr/</code> on their desktop or <code>/mobile/</code> on their phone. A clean Telugu keypad appears.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h4>📡 Call the Token</h4>
+          <p>Doctor dials the token number and taps <strong>Send</strong>. The WebSocket pushes the call to the display in &lt;50 ms.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <h4>🔊 Display Announces It</h4>
+          <p>The TV displays the number and speaks it in Telugu — "నంబర్ ఏడు". Elapsed time starts counting.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">6</div>
+        <div class="step-body">
+          <h4>🔁 Repeat All Day</h4>
+          <p>The doctor dials the next token. The display updates immediately. No page refresh, no server restart.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TWO EDITIONS -->
+<section class="editions" id="editions">
+  <div class="container">
+    <div class="section-label">Two Editions</div>
+    <h2 class="section-title">Pick the Right Fit for Your Clinic</h2>
+    <div class="divider"></div>
+    <p class="section-desc">
+      CareCall comes in two purpose-built flavours. Same stack, same design language, different broadcast model.
+      Choose based on how many consultation rooms you have.
+    </p>
+
+    <div class="editions-grid">
+
+      <!-- V1 -->
+      <div class="edition-card edition-v1">
+        <div class="edition-tag tag-v1">📡 Single Broadcast · v1</div>
+        <h3 class="edition-name">CareCall</h3>
+        <p class="edition-tagline">
+          One channel. One token at a time. Every connected display shows the same call simultaneously.
+          Perfect for a clinic with a single waiting area.
+        </p>
+        <ul class="edition-features">
+          <li><span class="feat-check">✅</span> Multiple TVs show the same call at once</li>
+          <li><span class="feat-check">✅</span> Doctor Mobile with 3 UI variants (V1, V2, V3)</li>
+          <li><span class="feat-check">✅</span> Desktop Doctor Console</li>
+          <li><span class="feat-check">✅</span> Telugu voice (1–30+) + English speech</li>
+          <li><span class="feat-check">✅</span> No configuration — zero setup beyond npm start</li>
+          <li><span class="feat-check">⬜</span> No room isolation — all displays hear all calls</li>
+        </ul>
+        <div>
+          <span class="edition-port">📦 appointment-notifier</span>
+          &nbsp;
+          <span class="edition-port">🔌 Port 3001</span>
+        </div>
+      </div>
+
+      <!-- V4 -->
+      <div class="edition-card edition-v4">
+        <div class="edition-tag tag-v4">🔑 Multi-Room Keyed · v4</div>
+        <h3 class="edition-name">CareCall Screens</h3>
+        <p class="edition-tagline">
+          Each room gets a private key. Doctor A's display only shows Doctor A's calls.
+          Doctor B's display only shows Doctor B's calls. Zero interference.
+        </p>
+        <ul class="edition-features">
+          <li><span class="feat-check">✅</span> Room Key pairing — set any string as key (101, A2, OPD)</li>
+          <li><span class="feat-check">✅</span> Key persisted in browser — survives refresh</li>
+          <li><span class="feat-check">✅</span> Live key-switch mid-session (no reconnect)</li>
+          <li><span class="feat-check">✅</span> Paired-screen count shown on Doctor Console</li>
+          <li><span class="feat-check">✅</span> Live TV Mirror card on Doctor Mobile</li>
+          <li><span class="feat-check">✅</span> Recall button — re-broadcast without re-dialling</li>
+        </ul>
+        <div>
+          <span class="edition-port">📦 appointment-notifier-screens</span>
+          &nbsp;
+          <span class="edition-port">🔌 Port 3002</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Decision Guide -->
+    <div style="margin-top:36px; background:rgba(15,23,42,0.6); border:1px solid rgba(148,163,184,0.15); border-radius:18px; padding:28px 28px;">
+      <p style="font-size:0.85rem; font-weight:800; color:var(--sky); text-transform:uppercase; letter-spacing:.1em; margin-bottom:16px;">Quick Decision Guide</p>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+        <div>
+          <p style="font-size:0.9rem; font-weight:700; color:#7dd3fc; margin-bottom:8px;">Use CareCall (V1) if…</p>
+          <ul style="color:var(--muted); font-size:0.88rem; line-height:1.7; padding-left:16px;">
+            <li>You have one consultation room</li>
+            <li>All TVs should show the same call</li>
+            <li>You want zero configuration</li>
+            <li>You have a single doctor calling</li>
+          </ul>
+        </div>
+        <div>
+          <p style="font-size:0.9rem; font-weight:700; color:#6ee7b7; margin-bottom:8px;">Use CareCall Screens (V4) if…</p>
+          <ul style="color:var(--muted); font-size:0.88rem; line-height:1.7; padding-left:16px;">
+            <li>You have 2+ consultation rooms</li>
+            <li>Each room has its own TV display</li>
+            <li>Doctors work independently</li>
+            <li>You run OPD with multiple doctors</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ARCHITECTURE -->
+<section id="arch">
+  <div class="container">
+    <div class="section-label">Architecture</div>
+    <h2 class="section-title">The One Key Difference</h2>
+    <div class="divider"></div>
+    <p class="section-desc">Same Node.js stack. The difference is in how the server routes a call event.</p>
+
+    <div class="arch-grid">
+      <div class="arch-card">
+        <div class="arch-header">
+          <span class="dot" style="background:#38bdf8;box-shadow:0 0 8px #38bdf8;"></span>
+          CareCall — Single Broadcast
+        </div>
+        <div class="arch-body">
+          <div class="arch-diagram"><span class="hl-sky">Doctor</span> ──call: 7──▶ /ws
+                   │
+     broadcast(wss, state)
+           sends to ALL
+           wss.clients
+                   │
+      ┌────────────┼──────────┐
+   <span class="hl-green">Display 1</span>  <span class="hl-green">Display 2</span>  <span class="hl-purple">Mobile</span>
+   (TV hall)  (corridor) (tablet)
+   all show 7, all speak</div>
+        </div>
+      </div>
+
+      <div class="arch-card">
+        <div class="arch-header">
+          <span class="dot" style="background:#34d399;box-shadow:0 0 8px #34d399;"></span>
+          CareCall Screens — Key-Targeted
+        </div>
+        <div class="arch-body">
+          <div class="arch-diagram"><span class="hl-sky">Doctor A</span> (key:101) ──call: 7──▶ /ws?key=101
+                             │
+              broadcastToKey(<span class="hl-amber">"101"</span>, state)
+                             │
+                     <span class="hl-green">Display (key:101)</span>
+                     → shows 7, speaks ✅
+
+<span class="hl-purple">Doctor B</span> (key:102) ──call: 3──▶ /ws?key=102
+                             │
+              broadcastToKey(<span class="hl-amber">"102"</span>, state)
+                             │
+                     <span class="hl-green">Display (key:102)</span>
+                     → shows 3, speaks ✅
+<span class="hl-sky">Display (key:101) untouched</span> 🔇</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SCREENS -->
+<section class="screens-alt" id="screens">
+  <div class="container">
+    <div class="section-label">The Screens</div>
+    <h2 class="section-title">Three Beautiful UI Screens</h2>
+    <div class="divider"></div>
+    <p class="section-desc">Every screen is a standalone HTML file — no framework, no build step. Open in any modern browser.</p>
+
+    <div class="screens-grid">
+      <div class="screen-card sc-display">
+        <div class="screen-icon si-display">📺</div>
+        <h3>Waiting Display</h3>
+        <p>
+          Full-screen TV layout. Left panel shows the giant token number. Right panel shows elapsed time, room key, and department.
+          Telugu audio announces each call. Voice toggle ensures browser autoplay compliance.
+        </p>
+        <span class="screen-url">/display/</span>
+      </div>
+      <div class="screen-card sc-mobile">
+        <div class="screen-icon si-mobile">📱</div>
+        <h3>Doctor Mobile</h3>
+        <p>
+          Compact touch keypad for smartphones and tablets. Shows a <strong>Live TV Mirror</strong> card ("NOW SERVING") reflecting what the display currently shows.
+          Recall button re-broadcasts without re-dialling. Bottom nav for quick switching.
+        </p>
+        <span class="screen-url">/mobile/</span>
+      </div>
+      <div class="screen-card sc-dr">
+        <div class="screen-icon si-dr">🩺</div>
+        <h3>Doctor Console</h3>
+        <p>
+          Desktop workstation dialer. Full 0–9 keypad with <strong>+1 Quick Next</strong> button.
+          Shows server connection status and (in V4) the count of paired display screens online.
+          Telugu UI throughout.
+        </p>
+        <span class="screen-url">/dr/</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AUDIO -->
+<section>
+  <div class="container">
+    <div class="section-label">Voice Announcements</div>
+    <h2 class="section-title">Bilingual Audio System</h2>
+    <div class="divider"></div>
+    <p class="section-desc">CareCall speaks to your patients in their language — Telugu first, English as fallback.</p>
+    <div class="audio-row">
+      <div class="audio-card">
+        <h3>🔊 Telugu Audio Clips</h3>
+        <p>
+          Pre-recorded <code>.wav</code> clips for numbers 1–10 say <strong>"నంబర్ [word]"</strong>
+          (e.g. "నంబర్ ఏడు" for 7). <code>.mp3</code> clips cover numbers 11 through 30+.
+          Served locally from <code>public/audio/te/</code> — no internet required.
+        </p>
+      </div>
+      <div class="audio-card">
+        <h3>🗣️ English Web Speech</h3>
+        <p>
+          For numbers beyond the Telugu clip range, the browser's built-in <code>speechSynthesis</code> API
+          announces in English. No extra files or APIs needed.
+          Click anywhere on the Display screen to satisfy the browser's autoplay policy.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- QUICK START -->
+<section class="qs-alt" id="start">
+  <div class="container">
+    <div class="section-label">Quick Start</div>
+    <h2 class="section-title">Running in Under a Minute</h2>
+    <div class="divider"></div>
+    <p class="section-desc">Node.js 20.6+ required. No other prerequisites.</p>
+    <div class="qs-grid">
+      <div class="qs-card">
+        <div class="qs-header" style="color:#7dd3fc;">📡 CareCall — Single Broadcast</div>
+        <div class="qs-body">
+          <pre class="code"><span class="c-comment"># Clone or download the repo</span>
+<span class="c-cmd">cd</span> appointment-notifier
+<span class="c-cmd">npm install</span>
+<span class="c-cmd">npm start</span>
+<span class="c-comment"># → listening on http://0.0.0.0:3001</span>
+
+<span class="c-comment"># Doctor opens</span>
+<span class="c-url">http://localhost:3001/dr/</span>
+
+<span class="c-comment"># TV opens</span>
+<span class="c-url">http://&lt;LAN-IP&gt;:3001/display/</span></pre>
+        </div>
+      </div>
+      <div class="qs-card">
+        <div class="qs-header" style="color:#6ee7b7;">🔑 CareCall Screens — Multi-Room</div>
+        <div class="qs-body">
+          <pre class="code"><span class="c-comment"># Clone or download the repo</span>
+<span class="c-cmd">cd</span> appointment-notifier-screens
+<span class="c-cmd">npm install</span>
+<span class="c-cmd">npm start</span>
+<span class="c-comment"># → listening on http://0.0.0.0:3002</span>
+
+<span class="c-comment"># Doctor sets Room Key (e.g. 101)</span>
+<span class="c-url">http://localhost:3002/dr/</span>  <span class="c-key">→ enter key: 101</span>
+
+<span class="c-comment"># TV sets same Room Key</span>
+<span class="c-url">http://&lt;LAN-IP&gt;:3002/display/</span>  <span class="c-key">→ enter key: 101</span></pre>
+        </div>
+      </div>
+    </div>
+    <p style="margin-top:20px; color:var(--dim); font-size:0.85rem;">
+      💡 Both servers can run on the same machine simultaneously — they use different ports.
+    </p>
+  </div>
+</section>
+
+<!-- COMPARISON TABLE -->
+<section>
+  <div class="container">
+    <div class="section-label">Side by Side</div>
+    <h2 class="section-title">Feature Comparison</h2>
+    <div class="divider"></div>
+    <div class="compare-table-wrap">
+      <table class="cmp">
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th>CareCall (V1)</th>
+            <th>CareCall Screens (V4)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Broadcast model</td><td class="cmp-sky">Single global channel</td><td class="cmp-grn">Per-room key channel</td></tr>
+          <tr><td>Multi-room support</td><td class="cmp-no">❌ Not isolated</td><td class="cmp-yes">✅ Full isolation</td></tr>
+          <tr><td>Room Key pairing</td><td class="cmp-no">❌</td><td class="cmp-yes">✅ Modal + badge</td></tr>
+          <tr><td>Key persisted in browser</td><td class="cmp-no">❌</td><td class="cmp-yes">✅ localStorage</td></tr>
+          <tr><td>Key change mid-session</td><td class="cmp-no">❌</td><td class="cmp-yes">✅ No reconnect</td></tr>
+          <tr><td>Paired screen count</td><td class="cmp-no">❌</td><td class="cmp-yes">✅ Shown in Doctor UI</td></tr>
+          <tr><td>Recall button</td><td class="cmp-no">❌</td><td class="cmp-yes">✅ On Doctor Mobile</td></tr>
+          <tr><td>Mobile UI variants</td><td class="cmp-sky">3 (V1, V2, V3)</td><td class="cmp-grn">1 (polished V4)</td></tr>
+          <tr><td>Telugu audio (1–30+)</td><td class="cmp-yes">✅</td><td class="cmp-yes">✅</td></tr>
+          <tr><td>English Web Speech</td><td class="cmp-yes">✅</td><td class="cmp-yes">✅</td></tr>
+          <tr><td>Default port</td><td>3001</td><td>3002</td></tr>
+          <tr><td>WebSocket heartbeat</td><td class="cmp-yes">✅ 25-second ping</td><td class="cmp-yes">✅ 25-second ping</td></tr>
+          <tr><td>Database / login</td><td>❌ None</td><td>❌ None</td></tr>
+          <tr><td>Build step required</td><td>❌ None</td><td>❌ None</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <strong>CareCall</strong> · Open Source · Self-Hosted · Telugu + English Voice ·
+  Built with Node.js, plain HTML/CSS, and ❤️
+  <br><br>
+  <a href="compare.html" style="color:var(--sky); text-decoration:none;">View detailed cross-repo comparison →</a>
+</footer>
+
+</body>
+</html>
